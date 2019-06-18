@@ -8,7 +8,7 @@ Part1: Registry on single docker-machine
 docker image pull registry:2.7.1
 
 2. Running registry by command:
-	cd ~/docker-workshop-042019/Workshop-2-3-Registry
+	cd ~/docker-workshop-072019/Workshop-2-3-Registry
 
 	docker container run -d -p 5000:5000 \
 	--restart=always --name registrylab \
@@ -62,15 +62,15 @@ Registry on multihost docker-machine
 	docker image pull registry:2.7.1
 	docker image pull labdocker/alpine:latest
 	cd ~/
-    git clone https://github.com/praparn/docker-workshop-042019.git
+    git clone https://github.com/praparn/docker-workshop-072019.git
 
 10. (Teacher Machine) Check ip address registry machine on control sheet
 
 11. (all) Check folder "Workshop-2-3-Registry" by command
-	ls ~/docker-workshop-042019/Workshop-2-3-Registry
+	ls ~/docker-workshop-072019/Workshop-2-3-Registry
 
 12. (all) Access to folder by command: 
-	cd ~/docker-workshop-042019/Workshop-2-3-Registry
+	cd ~/docker-workshop-072019/Workshop-2-3-Registry
 	pwd
 
 13. (all) Trust certificate via command:

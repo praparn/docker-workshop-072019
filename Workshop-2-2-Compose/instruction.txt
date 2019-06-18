@@ -9,8 +9,8 @@ Part1: COMPOSENODEJS
 ---------------------------------------------------------------------------------------------------
 
 1. Check folder "Workshop-2-2-Compose" and access to folder by command
-		ls ~/docker-workshop-042019/Workshop-2-2-Compose
-		cd ~/docker-workshop-042019/Workshop-2-2-Compose/composenodejs
+		ls ~/docker-workshop-072019/Workshop-2-2-Compose
+		cd ~/docker-workshop-072019/Workshop-2-2-Compose/composenodejs
 
 2. Start docker-compose on path by command: "docker-compose up -d"
 
@@ -29,8 +29,8 @@ Part2: MULTIPLENODEJS
 ---------------------------------------------------------------------------------------------------
 
 8. Check folder "Workshop-2-2-Compose" and access to folder by command
-		ls ~/docker-workshop-042019/Workshop-2-2-Compose
-		cd ~/docker-workshop-042019/Workshop-2-2-Compose/composemultinodejs
+		ls ~/docker-workshop-072019/Workshop-2-2-Compose
+		cd ~/docker-workshop-072019/Workshop-2-2-Compose/composemultinodejs
 
 9. Build image from docker-compose on path by command: "docker-compose build"
 

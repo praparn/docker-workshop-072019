@@ -7,12 +7,12 @@ Before Start Lab:
 Part 1: Host Path Debug Program
 ---------------------------------------------------------------------------------------------------------------
 1. Check folder "Workshop-1-7-Volume" by command
-	ls ~/docker-workshop-042019/Workshop-1-7-Volume
+	ls ~/docker-workshop-072019/Workshop-1-7-Volume
 
 2. Pull image of container for operate by command: "docker image pull labdocker/alpine:latest"
 3. Run container with mapping volume by command:
 	docker container run -dt --name linenotify \
-	--mount type=bind,source=/home/ubuntu/docker-workshop-042019/Workshop-1-7-Volume/LINE_Notify,target=/nodejs \
+	--mount type=bind,source=/home/ubuntu/docker-workshop-072019/Workshop-1-7-Volume/LINE_Notify,target=/nodejs \
 	labdocker/alpine:latest sh
 
 4. Attach to container by command: docker container exec -it linenotify sh
@@ -37,7 +37,7 @@ Part 1: Host Path Debug Program
 	node index.js
 
 9. Open another session and edit file index.js on VSCode and Test change sometext:
-	vi ~/docker-workshop-042019/Workshop-1-7-Volume/LINE_Notify/index.js 
+	vi ~/docker-workshop-072019/Workshop-1-7-Volume/LINE_Notify/index.js 
 	Line 36: var titleMSG="\n"+TITLE+"("+pID+")" ==> var titleMSG="\n"+TITLE+"("+pID+" Edit LINENOTIFY)"
 
 10. Rerun LINENotify on old session by command:

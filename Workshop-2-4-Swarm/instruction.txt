@@ -17,8 +17,8 @@ LAB Preparation
 
 	*Remark: If need you can renew clone workshop again by command below:
     cd ~/
-	sudo rm -rf ./docker-workshop-042019
-    git clone https://github.com/praparn/docker-workshop-042019.git
+	sudo rm -rf ./docker-workshop-072019
+    git clone https://github.com/praparn/docker-workshop-072019.git
 
 3. (all node) SSH/Putty to target machine with command below:
 ssh -i docker_lab ubuntu@<Public IP Address of Master>
@@ -159,15 +159,15 @@ Docker config and secret (master)
 ====================================================
 
 1. Access to folder on workshop and check file "nginx.conf","labdocker.com.crt","labdocker.com.key" by command:
-	ls ~/docker-workshop-042019/Workshop-2-4-Swarm/
+	ls ~/docker-workshop-072019/Workshop-2-4-Swarm/
 
 2. Create config file for nginx by command: 
-	docker config create nginx.conf ~/docker-workshop-042019/Workshop-2-4-Swarm/nginx.conf
+	docker config create nginx.conf ~/docker-workshop-072019/Workshop-2-4-Swarm/nginx.conf
 	docker config ls
 
 3. Create secret for .crt and .key by command:
-	docker secret create labdocker.com.crt ~/docker-workshop-042019/Workshop-2-4-Swarm/labdocker.com.crt
-	docker secret create labdocker.com.key ~/docker-workshop-042019/Workshop-2-4-Swarm/labdocker.com.key
+	docker secret create labdocker.com.crt ~/docker-workshop-072019/Workshop-2-4-Swarm/labdocker.com.crt
+	docker secret create labdocker.com.key ~/docker-workshop-072019/Workshop-2-4-Swarm/labdocker.com.key
 	docker secret ls
 
 4. Create service with publish port 443 by command:
@@ -265,10 +265,10 @@ docker node ls
 ==================================================
 Swarm Compose
 ==================================================
-1. (master) check folder python_restfulset by command: ls ~/docker-workshop-042019/Workshop-2-4-Swarm/python_restfulset/
+1. (master) check folder python_restfulset by command: ls ~/docker-workshop-072019/Workshop-2-4-Swarm/python_restfulset/
 
 2. (master) Deploy application stack by command:
-	cd ~/docker-workshop-042019/Workshop-2-4-Swarm/python_restfulset/
+	cd ~/docker-workshop-072019/Workshop-2-4-Swarm/python_restfulset/
 	docker stack deploy -c docker-compose_swarm.yml webservice
 
 3. (master) Monitor status of service/application stack by command: (5 - 10 min)
