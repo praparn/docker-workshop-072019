@@ -1,0 +1,320 @@
+For this workshop. We will group 3 machine per group for setup swarm mode with new architecture for demonstration below:
+
+===================================================
+LAB Preparation
+===================================================
+1. Following LABSheet.xlsx for identify your machine on Group. You will receive 3 machine per group like list below:
+############################################################################################################################################################################
+	Group No:			Machine name.											Private IP Address								Public IP Address				Role
+	1					Training_DockerZerotoHero_StudentG1_1					10.0.1.XX										X.X.X.X							Master
+	1					Training_DockerZerotoHero_StudentG1_2					10.0.1.XX										X.X.X.X							Worker1
+	1					Training_DockerZerotoHero_StudentG1_3					10.0.1.XX										X.X.X.X							Worker2
+############################################################################################################################################################################
+
+2. Follow sheet to access all machine of your group and clear existing configuration by command: 
+	cd ~/
+	docker system prune -af
+
+	*Remark: If need you can renew clone workshop again by command below:
+    cd ~/
+	sudo rm -rf ./docker-workshop-042019
+    git clone https://github.com/praparn/docker-workshop-042019.git
+
+3. (all node) SSH/Putty to target machine with command below:
+ssh -i docker_lab ubuntu@<Public IP Address of Master>
+ssh -i docker_lab ubuntu@<Public IP Address of Worker1>
+ssh -i docker_lab ubuntu@<Public IP Address of Worker2>
+
+4. (all node) Setup TMUX script and SSH for Share Session:
+sudo apt-get update && sudo apt-get install -y tmux
+tmux new -s Lab
+		* Remark: For your co-worker please kindly ssh to target node and join session with command #
+		tmux attach-session -t Lab
+
+5. (all node) Test docker by command: docker run hello-world
+
+===================================================
+Initial Swarm Cluster
+===================================================
+1. (master)Initial swarm cluster by command:
+
+	docker swarm init --advertise-addr <Private IP Address of Master>:2377 --task-history-limit 2
+	docker swarm join-token manager
+
+	====Result (Keep Token and Command)=====
+	To add a worker to this swarm, run the following command:
+
+    docker swarm join --token SWMTKN-1-1qnpobqw0hilpc5i90sz803tlhyi1h4k84uok10y814bvhyqf2-0ag405byoqpiqgqhoy6r866tv 10.0.1.104:2377
+
+	To add a manager to this swarm, run the following command:
+
+    docker swarm join --token SWMTKN-1-1qnpobqw0hilpc5i90sz803tlhyi1h4k84uok10y814bvhyqf2-3u9rqxfwhbhw52qwqeeiewybl 10.0.1.104:2377
+	========================================
+
+2. (worker1) Join node to swarm by command:
+docker swarm join --token SWMTKN-1-1qnpobqw0hilpc5i90sz803tlhyi1h4k84uok10y814bvhyqf2-0ag405byoqpiqgqhoy6r866tv 10.0.1.104:2377
+
+3. (worker2) Join node to swarm by command:
+docker swarm join --token SWMTKN-1-1qnpobqw0hilpc5i90sz803tlhyi1h4k84uok10y814bvhyqf2-0ag405byoqpiqgqhoy6r866tv 10.0.1.104:2377
+
+4. (master) Check status of all node that join to swarm cluster by command:
+	docker node ls
+
+===================================================
+Swarm Service (master)
+===================================================
+1. Initial docker service for nodes:
+	docker service create --name nodejs -dt labdocker/alpineweb:latest node hello.js
+
+2. Check process of container by command:
+	docker service ls
+	docker service ps nodejs
+
+3. Scale nodes by command: docker service scale nodejs=5
+
+4. Check latest scale by command: 
+	docker service ls
+	docker service ps nodejs
+
+5. Scale service back to 1 by command:
+	docker service scale nodejs=1
+	docker service ls
+	docker service ps nodejs
+
+6. Update reserve/limit CPU by command:
+	docker service update -dt --reserve-cpu 1 --limit-cpu 1 nodejs
+	docker service inspect nodejs | more
+	docker service inspect nodejs | grep update
+	docker service ps nodejs
+
+7. Stop & Remove service by command: docker service rm nodejs
+
+
+===================================================
+Orchestrator Assignment: node constrain (master)
+===================================================
+
+1. Run service with Constraint “node.id” as command below <change node id to master>:
+	docker node ls
+	docker service create -dt --constraint 'node.id==<master nodeid>' --name nodejs --replicas=5 labdocker/alpineweb:latest node hello.js
+	docker service ps nodejs
+
+2. Change service with Constrating “node.hostname” and delete Constraint “node.id” by  command below:
+	docker service update -dt --constraint-rm 'node.id==<master nodeid>' --constraint-add 'node.hostname!=<master hostname>' nodejs
+	docker service inspect nodejs | grep update
+	docker service ps nodejs
+	docker service rm nodejs
+
+====================================================
+Orchestrator Assignment: custom label on node (master)
+====================================================
+1. Add customise label to node in swarm cluster by command:
+	docker node ls
+	docker node update --label-add 'storage=sas' <master hostname>
+	docker node update --label-add 'storage=nvdimm' <worker1 hostname>
+	docker node update --label-add 'storage=sata' <worker2 hostname>
+
+2. Check configuration of node by command:
+	docker node inspect <master hostname>|grep storage
+	docker node inspect <worker1 hostname>|grep storage
+	docker node inspect <worker2 hostname>|grep storage
+
+3. Create service nodejs to running with constraint custom label by command:
+	docker service create -dt  --constraint 'node.labels.storage==sas' --name nodejs --replicas=5 labdocker/alpineweb:latest node hello.js
+	docker service ps nodejs
+	docker service rm nodejs
+
+====================================================
+Orchestrator Assignment: service preference placement (master)
+====================================================
+
+1. Add customise label to node in swarm cluster by command:
+	docker node ls
+	docker node update --label-add 'physical=DELLPE820' <master hostname>
+	docker node update --label-add 'physical=DELLPE820' <worker1 hostname>
+	docker node update --label-add 'physical=HP' <worker2 hostname>
+
+2. Check configuration of node by command:
+	docker node inspect <master hostname>|grep physical
+	docker node inspect <worker1 hostname>|grep physical
+	docker node inspect <worker2 hostname>|grep physical
+
+3. Create service nodejs to running with service placement preference by command:
+	docker service create -dt  --placement-pref 'spread=node.labels.physical' \
+	--name nodejs --replicas=10 labdocker/alpineweb:latest node hello.js
+	docker service ps nodejs
+	docker service rm nodejs
+
+4. Clear custom label on node by command:
+	docker node ls
+	docker node update --label-rm 'physical' <master hostname>
+	docker node update --label-rm 'physical' <worker1 hostname>
+	docker node update --label-rm 'physical' <worker2 hostname>
+	docker node update --label-rm 'storage' <master hostname>
+	docker node update --label-rm 'storage' <worker1 hostname>
+	docker node update --label-rm 'storage' <worker2 hostname>
+
+====================================================
+Docker config and secret (master)
+====================================================
+
+1. Access to folder on workshop and check file "nginx.conf","labdocker.com.crt","labdocker.com.key" by command:
+	ls ~/docker-workshop-042019/Workshop-2-4-Swarm/
+
+2. Create config file for nginx by command: 
+	docker config create nginx.conf ~/docker-workshop-042019/Workshop-2-4-Swarm/nginx.conf
+	docker config ls
+
+3. Create secret for .crt and .key by command:
+	docker secret create labdocker.com.crt ~/docker-workshop-042019/Workshop-2-4-Swarm/labdocker.com.crt
+	docker secret create labdocker.com.key ~/docker-workshop-042019/Workshop-2-4-Swarm/labdocker.com.key
+	docker secret ls
+
+4. Create service with publish port 443 by command:
+	docker service create -dt \
+     --name nginx \
+     --secret labdocker.com.key \
+     --secret labdocker.com.crt \
+     --config source=nginx.conf,target=/etc/nginx/nginx.conf \
+     -p 443:443 \
+     labdocker/nginx:latest
+
+5. Test access:
+	broswer: https <any public ip address of node>
+
+6. CleanUp by command:
+	docker service rm nginx
+	docker secret rm labdocker.com.crt
+	docker secret rm labdocker.com.key
+	docker config rm nginx.conf
+
+
+======================================================
+Overlay and Ingress Network 
+======================================================
+1. (master) Check current network on swarm with command: docker network ls
+
+2. (master) Create new overlay network for swarm with command:
+	docker network create --driver overlay --subnet=192.168.100.0/24 swarmnet
+	docker network ls
+
+3. (master) Create replica nodejs on difference node for test overlay network with command:
+	docker service create -dt --name nodejs \
+	--replicas=2 --network swarmnet -p 3000:3000 \
+	labdocker/alpineweb:latest node hello.js
+	docker service ps nodejs
+
+4. (all node)Check IP Address of both container and service ip address by command:
+	docker inspect nodejs.1.XX|grep IPAddress ==> Record IP Address (Ex: 192.168.100.4)
+	docker inspect nodejs.2.XX|grep IPAddress ==> Record IP Address (Ex: 192.168.100.3)
+	docker service inspect nodejs			==> Record IP Address (Ex: 192.168.100.2)
+
+5. Test access from container replica1 ==> VIP, replica2 and container replica2 ==> VIP, replica1 by command:
+	docker exec -it nodejs.1.xxx ping 192.168.100.3
+	docker exec -it nodejs.1.xxx ping 192.168.100.2
+	docker exec -it nodejs.2.xxx ping 192.168.100.4
+	docker exec -it nodejs.2.xxx ping 192.168.100.2
+
+6. Test access via web page of any node's ip address:
+
+		http://x.x.x.x:3000 <public ip address of master>
+		http://x.x.x.x:3000 <public ip address of worker1>
+		http://x.x.x.x:3000 <public ip address of worker2>
+
+7. CleanUp Lab
+	docker service rm nodejs
+	docker network rm swarmnet
+
+==================================================
+HA Manager Role in Swarm
+==================================================
+1. (master)Check state of swarm node by command: docker node ls
+
+2. (master) Up existing node “worker1” to manager by command:
+	docker node update --role manager <worker1 hostname>
+	docker node update --role manager <worker2 hostname>
+	docker node ls
+
+3. (master) Restart master by command: sudo shutdown -r now (Wait election about 5 min)
+
+4. (worker1 or worker2) Check swarm cluster status by command: docker node ls
+
+5. (master) Check master node when it back online: ssh -i "docker_lab" ubuntu@<Public IP>
+
+==================================================
+Remove Manager / Worker from Swarm Cluster
+==================================================
+1. (worker1, master) Remove role manager from "worker2" and drain node by command:
+	docker node ls
+	docker node update --role worker <worker2 hostname>
+	docker node update --availability drain <worker2 hostname>
+	docker node ls
+
+2. (worker2) Leave from swarm cluster by command: docker swarm leave
+
+3. (worker1, master) Check node status of “labdocker” by command: docker node ls
+
+4. (worker2) After node status “Down” we can remove node by command: 
+	docker node rm <worker2 hostname>
+	docker node ls
+
+5. (worker2) Rejoin workder2 as manager by join token command:
+docker swarm join --token SWMTKN-1-1qnpobqw0hilpc5i90sz803tlhyi1h4k84uok10y814bvhyqf2-3u9rqxfwhbhw52qwqeeiewybl 10.0.1.104:2377
+docker node ls
+
+==================================================
+Swarm Compose
+==================================================
+1. (master) check folder python_restfulset by command: ls ~/docker-workshop-042019/Workshop-2-4-Swarm/python_restfulset/
+
+2. (master) Deploy application stack by command:
+	cd ~/docker-workshop-042019/Workshop-2-4-Swarm/python_restfulset/
+	docker stack deploy -c docker-compose_swarm.yml webservice
+
+3. (master) Monitor status of service/application stack by command: (5 - 10 min)
+	docker stack ls
+	docker stack services webservice
+	docker stack ps webservice
+
+
+4. Test access web front by ip of docker node via command:
+	export Server_IP=<ip of any node>
+	export Server_Port=80
+
+	(basic test web)
+	curl http://$Server_IP:$Server_Port/
+
+	(initial database)
+	curl http://$Server_IP:$Server_Port/init
+
+
+5. Test insert/retrieve/delete data by command:
+
+	(insert data by rest)
+	  curl -i -H "Content-Type: application/json" -X POST -d '{"uid": "1", "user":"Praparn Luangphoonlap", "descripe":"Slave"}' http://$Server_IP:$Server_Port/users/insertuser
+      curl -i -H "Content-Type: application/json" -X POST -d '{"uid": "2", "user":"Somchai Sunsukwan", "descripe":"Security Guard"}' http://$Server_IP:$Server_Port/users/insertuser
+      curl -i -H "Content-Type: application/json" -X POST -d '{"uid": "3", "user":"Sanyachan Panrudee", "descripe":"House Keeping"}' http://$Server_IP:$Server_Port/users/insertuser
+      curl -i -H "Content-Type: application/json" -X POST -d '{"uid": "4", "user":"Sakkan Yanyicharoen", "descripe":"Messenger"}' http://$Server_IP:$Server_Port/users/insertuser
+      curl -i -H "Content-Type: application/json" -X POST -d '{"uid": "5", "user":"Chatchai Moungang", "descripe":"Programmer"}' http://$Server_IP:$Server_Port/users/insertuser
+      curl -i -H "Content-Type: application/json" -X POST -d '{"uid": "6", "user":"Anusit Kannaphat", "descripe":"DevOps Manager"}' http://$Server_IP:$Server_Port/users/insertuser
+      curl -i -H "Content-Type: application/json" -X POST -d '{"uid": "7", "user":"Meelarp Maisanuk", "descripe":"System Engineer"}' http://$Server_IP:$Server_Port/users/insertuser
+      curl -i -H "Content-Type: application/json" -X POST -d '{"uid": "8", "user":"Pansa Bunsong", "descripe":"Secuirty Guard"}' http://$Server_IP:$Server_Port/users/insertuser
+      curl -i -H "Content-Type: application/json" -X POST -d '{"uid": "9", "user":"Wiphanee Wongsaisawan", "descripe":"Administrator"}' http://$Server_IP:$Server_Port/users/insertuser
+
+	(retrieve data)
+	  curl http://$Server_IP:$Server_Port/users/1
+      curl http://$Server_IP:$Server_Port/users/1 ==> Expect from Cache
+      curl http://$Server_IP:$Server_Port/users/4
+      curl http://$Server_IP:$Server_Port/users/4 ==> Expect from Cache
+
+	(delete data)
+	  curl http://$Server_IP:$Server_Port/users/removeuser/1
+      curl http://$Server_IP:$Server_Port/users/removeuser/2
+      curl http://$Server_IP:$Server_Port/users/removeuser/3
+      curl http://$Server_IP:$Server_Port/users/removeuser/4
+
+==================================================
+Clean Up
+==================================================
+1. (master) Remove docker stack by command:
+	docker stack rm webservice

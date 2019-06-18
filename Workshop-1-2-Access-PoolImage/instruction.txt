@@ -1,0 +1,14 @@
+Pull image 
+1. docker image pull labdocker/alpine:latest	
+2. docker image pull labdocker/alpineweb:latest
+3. docker image pull labdocker/cadvisor:latest
+4. docker image pull labdocker/ubuntu:latest
+5. docker images or docker image ls==> check sizing and detail of all image
+6. docker image pull for lab day 2
+    docker image pull labdocker/mariadb:latest    
+    docker image pull labdocker/alpinepython:2.7-onbuild
+    docker image pull labdocker/linenotify:bot_v2
+    docker image pull labdocker/cluster:webservicelite
+7. Check history of image by command: 
+    docker image history labdocker/alpine:latest
+    docker image history labdocker/alpineweb:latest

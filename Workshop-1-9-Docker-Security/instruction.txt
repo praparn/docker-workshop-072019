@@ -1,0 +1,106 @@
+For this workshop. We will demonstration enhance security on docker
+
+Part1: Apparmor in Container
+-----------------------------------------------------------------------------------------------------------------
+1. Run container for test default profile of Apparmor by command: "docker container run -dt --name sectestdefault labdocker/alpine:latest sh"
+
+2. Access in to container and test some activity:
+	docker container exec -it sectestdefault sh
+	ping 1.1.1.1
+	apk update
+	apk add curl
+	curl https://www.google.com
+
+3. Test write file on /proc (prohibit path):
+	touch /tmp/testcreatefile1
+	touch /home/testcreatefile2
+	touch /etc/testcreatefile3
+	touch /proc/testcreatefile4
+	cp /tmp/testcreatefile /proc/testprohibitfile
+	ls -hl /proc | grep test
+
+4. Stop test container by command: "docker container stop sectestdefault && docker container rm sectestdefault"
+
+5. Copy profile and Load apparmor restrict profile by command:
+	sudo apparmor_parser -r -W ~/docker-workshop-042019/Workshop-1-9-Docker-Security/restrict-apparmor
+
+6. Check current profile of apparmor by command: sudo aa-status
+
+7. Run container for test restrict profile of Apparmor by command:
+	docker container run -dt --name sectestrestrict --security-opt "apparmor=restrict-apparmor" labdocker/alpine:latest sh
+
+8. Access in to container and test some activity:
+	docker container exec -it sectestrestrict sh
+	ping 1.1.1.1
+	apk update
+	apk add curl
+	curl https://www.google.com
+
+9. Test write file on /proc (prohibit path):
+	touch /tmp/testcreatefile1
+	touch /home/testcreatefile2
+	touch /etc/testcreatefile3
+	touch /proc/testcreatefile4
+	cp /tmp/testcreatefile /proc/testprohibitfile
+	ls -hl /proc | grep test
+
+10. Stop test container by command: "docker container stop sectestrestrict && docker container rm sectestrestrict"
+
+11. Remove apparmor profile by command: sudo apparmor_parser -R ~/docker-workshop-042019/Workshop-1-9-Docker-Security/restrict-apparmor && sudo aa-status
+
+
+-----------------------------------------------------------------------------------------------------------------
+Part2: Content Trust (Signed Image)
+-----------------------------------------------------------------------------------------------------------------
+1. Enable content trust feature by command:
+export DOCKER_CONTENT_TRUST=1
+
+2. Create repository "alpine" on hub.docker.com and Tag image with out sign image and push to hub.docker.com by command:
+docker image tag labdocker/alpine:latest <username>/alpine:unsign
+docker login
+docker image push --disable-content-trust=true <username>/alpine:unsign
+docker logout
+
+3. Remove existing image and test pull image from hub.docker.com by command:
+docker image remove <username>/alpine:unsign
+docker image ls
+docker image pull <username>/alpine:unsign
+docker image ls
+
+4. Pull image with disable feature content trust by command:
+docker image pull --disable-content-trust=true <username>/alpine:unsign
+docker image ls
+
+5. Tag image sign image and push to hub.docker.com by command:
+docker image tag labdocker/alpine:latest <username>/alpine:sign
+docker login
+docker push <username>/alpine:sign
+	*Remark:
+		This step docker will ask for passphase for root key and repository, Please input as you prefer
+docker logout
+#####################################
+Example: Output
+#####################################
+The push refers to a repository [docker.io/praparn/alpine]
+6102f0d2ad33: Layer already exists 
+sign: digest: sha256:65242e8220a341cec40628caaea77eb4acd2fc252329aa853526fde15a4a1d85 size: 528
+Signing and pushing trust metadata
+You are about to create a new root signing key passphrase. This passphrase
+will be used to protect the most sensitive key in your signing system. Please
+choose a long, complex passphrase and be careful to keep the password and the
+key file itself secure and backed up. It is highly recommended that you use a
+password manager to generate the passphrase and keep it safe. There will be no
+way to recover this key. You can find the key in your config directory.
+Enter passphrase for new root key with ID ca6ab4b: <password>
+Repeat passphrase for new root key with ID ca6ab4b: <password>
+Enter passphrase for new repository key with ID 68d88cd (docker.io/praparn/alpine): <password>
+Repeat passphrase for new repository key with ID 68d88cd (docker.io/praparn/alpine): <password>
+Finished initializing "docker.io/praparn/alpine"
+Successfully signed "docker.io/praparn/alpine":sign
+
+6. Remove existing image and test pull image from hub.docker.com by command:
+docker image remove <username>/alpine:sign
+docker image ls
+docker image pull <username>/alpine:sign
+docker image ls
+export DOCKER_CONTENT_TRUST=0
