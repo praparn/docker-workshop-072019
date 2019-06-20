@@ -73,7 +73,7 @@ Part 3: RESTFUL Python
 	docker container run -dt --name cachedb --net=restful_switch --network-alias=cachedb labdocker/redis:latest
 
 	(webservice: pythonrestful)
-	docker container run -dt --name webservice --net=restful_switch --network-alias=webservice -p 5000:5000 labdocker/webservice:1.0
+	docker container run -dt --name webservice --net=restful_switch --network-alias=webservice -p 5000:5000 labdocker/webservice:1.0 
 
 	(webcache: nginx)
 	docker container run -dt --name webcache --net=restful_switch --network-alias=webcache -p 80:8080 labdocker/webcache:1.0
@@ -90,7 +90,7 @@ Part 3: RESTFUL Python
 	curl http://$Server_IP:$Server_Port/init
 
 	(insert data by rest)
-	  	curl -i -H "Content-Type: application/json" -X POST -d '{"uid": "1", "user":"Praparn Luangphoonlap", "descripe":"Slave"}' http://$Server_IP:$Server_Port/users/insertuser
+	  curl -i -H "Content-Type: application/json" -X POST -d '{"uid": "1", "user":"Praparn Luangphoonlap", "descripe":"Slave"}' http://$Server_IP:$Server_Port/users/insertuser
       curl -i -H "Content-Type: application/json" -X POST -d '{"uid": "2", "user":"Somchai Sunsukwan", "descripe":"Security Guard"}' http://$Server_IP:$Server_Port/users/insertuser
       curl -i -H "Content-Type: application/json" -X POST -d '{"uid": "3", "user":"Sanyachan Panrudee", "descripe":"House Keeping"}' http://$Server_IP:$Server_Port/users/insertuser
       curl -i -H "Content-Type: application/json" -X POST -d '{"uid": "4", "user":"Sakkan Yanyicharoen", "descripe":"Messenger"}' http://$Server_IP:$Server_Port/users/insertuser
@@ -101,13 +101,13 @@ Part 3: RESTFUL Python
       curl -i -H "Content-Type: application/json" -X POST -d '{"uid": "9", "user":"Wiphanee Wongsaisawan", "descripe":"Administrator"}' http://$Server_IP:$Server_Port/users/insertuser
 
 	(retrieve data)
-	  	curl http://$Server_IP:$Server_Port/users/1
+	  curl http://$Server_IP:$Server_Port/users/1
       curl http://$Server_IP:$Server_Port/users/1 ==> Expect from Cache
       curl http://$Server_IP:$Server_Port/users/4
       curl http://$Server_IP:$Server_Port/users/4 ==> Expect from Cache
 
 	(delete data)
-	  	curl http://$Server_IP:$Server_Port/users/removeuser/1
+	  curl http://$Server_IP:$Server_Port/users/removeuser/1
       curl http://$Server_IP:$Server_Port/users/removeuser/2
       curl http://$Server_IP:$Server_Port/users/removeuser/3
       curl http://$Server_IP:$Server_Port/users/removeuser/4

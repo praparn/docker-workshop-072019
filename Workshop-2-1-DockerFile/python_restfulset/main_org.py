@@ -10,23 +10,16 @@ import time
 import hashlib
 import os
 import json
-flagloop= 0
+
 app = Flask(__name__)
 startTime = datetime.now()
-while flagloop == 0:
-    try:
-        db = MySQLdb.connect("maindb","root","password")
-    except:
-        time.sleep(2)
-        continue
-    else:
-        flagloop= 1
-
 CACHE_DB = redis.Redis(host=os.environ.get('REDIS_HOST', 'cachedb'), port=6379)
+db = MySQLdb.connect("maindb","root","password")
 MAIN_DB = db.cursor()
 @app.route('/')
 def hello():
     return '<H1> Welcome Page from Container Python Lab </H1>Checkpoint Date/Time: ' + time.strftime("%c") +'\n'
+
 @app.route('/init')
 def init():
     MAIN_DB.execute("DROP DATABASE IF EXISTS ACCTABLE")
