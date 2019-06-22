@@ -38,7 +38,7 @@ Part2: MULTIPLENODEJS
 
 11. Create network and start all container from docker-compose on path by command: "docker-compose up -d"
 
-12. Open url: http://<Public IP>/nodejs for check result
+12. Open url: http://<Public IP>/nodejs, https://<Public IP>/nodejs for check result
 
 13. Stop docker-compose by command: "docker-compose stop"
 
