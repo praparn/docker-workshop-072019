@@ -1,5 +1,5 @@
 Link for download:
-1. Check LABSheet.xlsx for check information about your machine and your "docker_lab" (For MAC OS X) or "docker_lab.ppk" (For Windows)
+1. Check GoogleSheet for check information about your machine and your "docker_lab" (For MAC OS X) or "docker_lab.ppk" (For Windows)
 2. Check Document for connect to your AWS
 3. Test docker command by running: docker run hello-world
 

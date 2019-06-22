@@ -2,7 +2,7 @@ For this workshop. We need you to deploy NGINX for load balance and reverse prox
 ================================================================================
 Part1: Reverse Proxy by DNS
 ================================================================================
-1. Pull image nginx with command: 			"docker image pull labdocker/nginx:labnetwork"
+1. Pull image nginx with command: 			"docker image pull labdocker/nginx:labnetworkhttp2"
 2. Pull image nodejs (web1) with command:	"docker image pull labdocker/alpineweb:web1"
 3. Pull image nodejs (web2) with command:	"docker image pull labdocker/alpineweb:web2"
 4. Create Public Network with command:
@@ -19,15 +19,23 @@ Part1: Reverse Proxy by DNS
 	docker container run -dt --name web2 --net webinternal --net-alias web2 labdocker/alpineweb:web2 node hello.js
 
 6. Run container nginx and attach network 
-	docker container run -dt --name nginx --net webinternal -p 80:8080 labdocker/nginx:labnetwork
+	docker container run -dt --name nginx --net webinternal -p 80:8080 -p 443:8443 labdocker/nginx:labnetworkhttp2
 	docker network connect webpublic nginx
 
-7. Open url: http://<Public IP>/nodejs
+7. Open url: 
+			http://<Public IP>/nodejs
+			https://<Public IP>/nodejs
+
+	* from command line: 
+			curl http://<Public IP>/nodejs -v
+			curl https://<Public IP>/nodejs -v -k 
 
 8. Shell to nginx and test curl to nodejs with command below:
 	docker container exec -it nginx sh
 	curl http://web1:3000
+	curl http://web1:3000 -I
 	curl http://web2:3000
+	curl http://web2:3000 -I
 
 9. Clean up container with command:
 	docker container stop web1 web2 nginx
@@ -39,7 +47,7 @@ DEMO: Reverse Proxy by DNS with MACVLAN (DEMO from Instructor)
 Note: If you need to join this lab. You need to install docker-machine over oracle virtualbox on MAC OS X
 ================================================================================
 1. Pull image nginx with command: 		
-	"docker image pull labdocker/nginx:labnetwork"
+	"docker image pull labdocker/nginx:labnetworkhttp2"
 
 2. Check and Locate Network Card by command:
 	ifconfig / ip addr
@@ -92,7 +100,7 @@ lo        Link encap:Local Loopback
 	
 	docker container run -dt --name web2 --net macvlanlab --ip 192.168.99.194 --net-alias web2 labdocker/alpineweb:web2 node hello.js
 
-	docker container run -dt --name nginx --net macvlanlab --ip 192.168.99.195 --net-alias nginx labdocker/nginx:labnetwork
+	docker container run -dt --name nginx --net macvlanlab --ip 192.168.99.195 --net-alias nginx labdocker/nginx:labnetworkhttp2
 
 4. On virtualbox: Set Property of Network Card for promiscuous mode
 and configure nic card for promiscuous mode via command:
@@ -100,18 +108,26 @@ and configure nic card for promiscuous mode via command:
 
 5. Test internal container connection by command:
 	docker container exec -it nginx curl http://web1:3000
+	docker container exec -it nginx curl http://web1:3000 -I
 	docker container exec -it nginx curl http://web2:3000
+	docker container exec -it nginx curl http://web2:3000 -I
 	docker container exec -it nginx ping web1
 	docker container exec -it nginx ping web2
 
-6. Test connect from outside by command: (Operate on Your notebook)
+6. Test connect from outside by command: (Operate on teacher macbook)
 	ping 192.168.99.193
 	ping 192.168.99.194
 	ping 192.168.99.195
+	curl http://192.168.99.193:3000 -v
+	curl http://192.168.99.194:3000 -v
+	curl http://192.168.99.195:8080 -v
+	curl https://192.168.99.195:8443 -v -k
 
 7. Test open url for access by command:
 	http://192.168.99.195:8080/					==> via NGINX
 	http://192.168.99.195:8080/nodejs			==> via NGINX
+	https://192.168.99.195:8443					==> via NGINX
+	https://192.168.99.195:8443/nodejs			==> via NGINX
 	http://192.168.99.193:3000/					==> Native NODEJS1
 	http://192.168.99.194:3000/					==> Native NODEJS2
 

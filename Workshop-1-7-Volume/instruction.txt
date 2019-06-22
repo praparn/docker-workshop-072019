@@ -23,8 +23,8 @@ Part 1: Host Path Debug Program
 	apk add nodejs nodejs-npm curl vim bash
 
 7. Set environment for make code operate by command:
-	export NODE_VERSION=v4.3.0 
-	export NPM_VERSION=2.14.12
+	export NODE_VERSION=v10.14.2-r0 
+	export NPM_VERSION=10.14.2-r0
 	export TITLE=NODEJS_BOT_NOTIFY_PRAPARN										==> Replace with your name
 	export INTERVAL=10000 
 	export HEAP_HIGH=70 
