@@ -23,7 +23,7 @@ docker image pull registry:2.7.1
 
 *REMARK: Keep digest :
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- sha256:02892826401a9d18f0ea01f8a2f35d328ef039db4e1edcc45c630314a0457d5b size: 528
+ sha256:bf1684a6e3676389ec861c602e97f27b03f14178e5bc3f70dce198f9f160cce9 size: 528
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -36,9 +36,7 @@ docker image pull registry:2.7.1
 	curl -v --silent -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
 	-X GET http://localhost:5000/v2/alpine/manifests/latest 2>&1 | grep Docker-Content-Digest | awk '{print ($3)}'
 
-
 6. Test Delete and redownload docker image with command:
-
 	docker image rm localhost:5000/alpine:latest
 	docker image ls
 	docker image pull localhost:5000/alpine:latest
@@ -46,7 +44,7 @@ docker image pull registry:2.7.1
 
 7. Delete docker images from registry
 
-	curl -X DELETE http://127.0.0.1:5000/v2/alpine/manifests/sha256:02892826401a9d18f0ea01f8a2f35d328ef039db4e1edcc45c630314a0457d5b
+	curl -X DELETE http://127.0.0.1:5000/v2/alpine/manifests/sha256:bf1684a6e3676389ec861c602e97f27b03f14178e5bc3f70dce198f9f160cce9
 	
 
 8. Clean Up Lab by command:
@@ -117,7 +115,7 @@ Registry on multihost docker-machine
 	docker image push labdocker.com:5000/alpine:1.0
 
 	docker logout labdocker.com:5000
-	*REMARK: digest: sha256:65242e8220a341cec40628caaea77eb4acd2fc252329aa853526fde15a4a1d85 size: 506
+	*REMARK: digest: sha256:bf1684a6e3676389ec861c602e97f27b03f14178e5bc3f70dce198f9f160cce9 size: 506
 
 20. (all) Test pull image from registry machine by command:
 	docker login labdocker.com:5000
@@ -128,7 +126,7 @@ Registry on multihost docker-machine
 	curl -u docker:tcuser --cacert $(pwd)/labdocker.com.crt -X GET https://labdocker.com:5000/v2/_catalog ==> List all images in catalog
 	curl -u docker:tcuser --cacert $(pwd)/labdocker.com.crt -X GET https://labdocker.com:5000/v2/alpine/tags/list ==> List all tag on alpine image
 	curl -u docker:tcuser --cacert $(pwd)/labdocker.com.crt \
-	-X DELETE https://labdocker.com:5000/v2/alpine/manifests/sha256:02892826401a9d18f0ea01f8a2f35d328ef039db4e1edcc45c630314a0457d5b
+	-X DELETE https://labdocker.com:5000/v2/alpine/manifests/sha256:bf1684a6e3676389ec861c602e97f27b03f14178e5bc3f70dce198f9f160cce9
 
 22. (Teacher Machine) Cleanup by command:
 	docker container stop registrylab
