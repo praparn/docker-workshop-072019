@@ -74,7 +74,7 @@ docker image ls
 5. Tag image sign image and push to hub.docker.com by command:
 docker image tag labdocker/alpine:latest <username>/alpine:sign
 docker login
-docker push <username>/alpine:sign
+docker image push <username>/alpine:sign
 	*Remark:
 		This step docker will ask for passphase for root key and repository, Please input as you prefer
 docker logout
@@ -97,6 +97,17 @@ Enter passphrase for new repository key with ID 68d88cd (docker.io/praparn/alpin
 Repeat passphrase for new repository key with ID 68d88cd (docker.io/praparn/alpine): <password>
 Finished initializing "docker.io/praparn/alpine"
 Successfully signed "docker.io/praparn/alpine":sign
+
+*Remark:
+For backup your key:
+tar -czvf private_keys_backup.tar.gz ~/.docker/trust/private
+scp -i "~/.ssh/docker_lab.pem" ubuntu@<public ip>:/home/ubuntu/private_keys_backup.tar.gz ./
+
+For restore your key:
+scp -i "~/.ssh/docker_lab.pem" private_keys_backup.tar.gz ubuntu@<public ip>:/home/ubuntu/
+cd ~
+tar -xzvf ./private_keys_backup.tar.gz -C ~/temp
+cp -r ~/temp/home/docker/.docker/trust/private/* ~/.docker/trust/private && rm -rf temp
 
 6. Remove existing image and test pull image from hub.docker.com by command:
 docker image remove <username>/alpine:sign

@@ -1,5 +1,18 @@
 For this workshop. We will demonstration how to check log / configuration of container running
+=============================================================================================
+Part 1: Setup daemon.json for log rotate on docker daemon
+1. Copy daemon.json to /etc/docker by command:
+sudo cp ~/docker-workshop-072019/Workshop-1-8-Inspect-Logs/daemon.json /etc/docker/
 
+2. Reload docker daemon by command:
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+
+3. Check log daemon by command:
+docker info
+
+=============================================================================================
+Part 2: 
 1. Create container nginx with command:
 docker container run -dt --name nginx -p 80:80 \
 --log-driver json-file \
