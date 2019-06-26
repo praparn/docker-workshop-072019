@@ -105,9 +105,9 @@ scp -i "~/.ssh/docker_lab.pem" ubuntu@<public ip>:/home/ubuntu/private_keys_back
 
 For restore your key:
 scp -i "~/.ssh/docker_lab.pem" private_keys_backup.tar.gz ubuntu@<public ip>:/home/ubuntu/
-cd ~
+cd ~ && mkdir ~/temp
 tar -xzvf ./private_keys_backup.tar.gz -C ~/temp
-cp -r ~/temp/home/docker/.docker/trust/private/* ~/.docker/trust/private && rm -rf temp
+cp -r ~/temp/home/docker/.docker/trust/private/* ~/.docker/trust/private && rm -rf ~/temp
 
 6. Remove existing image and test pull image from hub.docker.com by command:
 docker image remove <username>/alpine:sign
