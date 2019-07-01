@@ -111,7 +111,7 @@ Orchestrator Assignment: custom label on node (master)
 1. Add customise label to node in swarm cluster by command:
 	docker node ls
 	docker node update --label-add 'storage=sas' <master hostname>
-	docker node update --label-add 'storagnvdimm' <worker1 hostname>
+	docker node update --label-add 'storage=nvdimm' <worker1 hostname>
 	docker node update --label-add 'storage=sata' <worker2 hostname>
 
 2. Check configuration of node by command:
